@@ -1,0 +1,9 @@
+apiVersion: kms.ansible-provider-gcp.crossplane.io/v1alpha1
+kind: KeyRing
+metadata:
+  name: keyring-sample
+spec:
+  forProvider:
+    location: global
+  providerConfigRef:
+    name: gcp-provider

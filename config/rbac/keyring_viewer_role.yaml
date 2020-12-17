@@ -1,0 +1,20 @@
+# permissions for end users to view keyrings.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: keyring-viewer-role
+rules:
+- apiGroups:
+  - kms.ansible-provider-gcp.crossplane.io
+  resources:
+  - keyrings
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - kms.ansible-provider-gcp.crossplane.io
+  resources:
+  - keyrings/status
+  verbs:
+  - get

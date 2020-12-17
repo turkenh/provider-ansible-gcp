@@ -1,0 +1,24 @@
+# permissions for end users to edit keyrings.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: keyring-editor-role
+rules:
+- apiGroups:
+  - kms.ansible-provider-gcp.crossplane.io
+  resources:
+  - keyrings
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - kms.ansible-provider-gcp.crossplane.io
+  resources:
+  - keyrings/status
+  verbs:
+  - get

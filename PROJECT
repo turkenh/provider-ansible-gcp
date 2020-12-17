@@ -1,0 +1,8 @@
+domain: ansible-provider-gcp.crossplane.io
+layout: ansible.sdk.operatorframework.io/v1
+projectName: provider-ansible-gcp
+resources:
+- group: kms
+  kind: KeyRing
+  version: v1alpha1
+version: 3-alpha

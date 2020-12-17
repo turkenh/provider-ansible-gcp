@@ -1,0 +1,41 @@
+---
+# TODO: Consider packing these Crossplane specific pre steps as a reusable ansible role
+- name: Get the provider config object
+  community.kubernetes.k8s_info:
+    api_version: gcp.crossplane.io/v1beta1
+    kind: ProviderConfig
+    name: "{{ provider_config_ref.name }}"
+  register: provider_config
+
+- name: Read the provider credentials secret
+  community.kubernetes.k8s_info:
+    api_version: v1
+    kind: Secret
+    name: "{{ provider_config.resources[0].spec.credentials.secretRef.name }}"  
+    namespace: "{{ provider_config.resources[0].spec.credentials.secretRef.namespace }}"    
+  register: provider_creds_secret       
+###  
+
+# TODO: Consider auto-generating this step per resource
+- name: create the GCP KMS key ring
+  google.cloud.gcp_kms_key_ring:
+    name: "{{ ansible_operator_meta.name }}"
+    location: "{{ for_provider.location }}"
+    project: "{{ provider_config.resources[0].spec.projectID }}"
+    auth_kind: serviceaccount
+    service_account_contents: "{{ provider_creds_secret.resources[0].data['key.json'] | b64decode }}"
+    state: present
+  register: at_provider_status
+###
+
+# TODO: Consider packing these Crossplane specific pre steps as a reusable ansible role
+# TODO: Also post Crossplane compatible status conditions
+- name: update status
+  operator_sdk.util.k8s_status:
+    api_version: kms.ansible-provider-gcp.crossplane.io/v1alpha1
+    kind: KeyRing
+    name: "{{ ansible_operator_meta.name }}"
+    namespace: "{{ ansible_operator_meta.namespace }}"
+    status:
+      atProvider: "{{ at_provider_status }}"
+###
